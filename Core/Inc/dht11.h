@@ -12,16 +12,16 @@
 // Initialization of 1-wire
 // Start timer for us delay
 // return - HAL_OK/HAL_ERROR
-HAL_StatusTypeDef wire_init(void);
+HAL_StatusTypeDef dht11_init(void);
 
 // Send start sequence to begin communication with dht11
 // return - HAL_OK/HAL_ERROR
 HAL_StatusTypeDef start_measurment(void);
 
-// Read measure temperature
+// Read measured temperature
 // return - temperature in Celsius degrees
 uint8_t read_temperature();
 
-// Read measure humidity
+// Read measured humidity
 // return - relative humidity in %
 uint8_t read_temperature();

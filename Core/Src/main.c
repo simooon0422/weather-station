@@ -89,6 +89,8 @@ int main(void)
   MX_TIM6_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  dht11_init();
+  HAL_StatusTypeDef test = start_measurment();
 
   /* USER CODE END 2 */
 
