@@ -14,14 +14,13 @@
 // return - HAL_OK/HAL_ERROR
 HAL_StatusTypeDef dht11_init(void);
 
-// Send start sequence to begin communication with dht11
-// return - HAL_OK/HAL_ERROR
-HAL_StatusTypeDef start_measurment(void);
+// Read bits sent from sensor
+void read_data(void);
 
 // Read measured temperature
 // return - temperature in Celsius degrees
-uint8_t read_temperature();
+uint8_t get_temperature();
 
 // Read measured humidity
 // return - relative humidity in %
-uint8_t read_temperature();
+uint8_t get_temperature();

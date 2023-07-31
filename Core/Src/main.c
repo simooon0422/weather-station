@@ -90,7 +90,8 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   dht11_init();
-  HAL_StatusTypeDef test = start_measurment();
+//  HAL_StatusTypeDef test = start_measurment();
+  read_data();
 
   /* USER CODE END 2 */
 
@@ -98,6 +99,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+//	  read_data();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
