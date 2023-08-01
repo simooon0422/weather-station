@@ -23,4 +23,4 @@ uint8_t get_temperature();
 
 // Read measured humidity
 // return - relative humidity in %
-uint8_t get_temperature();
+uint8_t get_humidity();

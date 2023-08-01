@@ -108,7 +108,10 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint8_t temp = get_temperature();
+  uint8_t hum = get_humidity();
+
   printf("Temperature: %d\n", temp);
+  printf("Humidity: %d\n", hum);
 
   while (1)
   {

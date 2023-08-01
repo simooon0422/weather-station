@@ -33,7 +33,7 @@ static HAL_StatusTypeDef start_measurment(void)
 	delay_us(40);
 	response = HAL_GPIO_ReadPin(DHT11_GPIO_Port, DHT11_Pin);
 	delay_us(160);
-	return HAL_OK;
+
 	if(response == 0)
 	{
 		return HAL_OK;
@@ -115,8 +115,16 @@ uint8_t get_temperature()
 	return temp_reading;
 }
 
-//uint8_t get_humidity()
-//{
-//
-//}
+uint8_t get_humidity()
+{
+	uint8_t hum_reading = 0;
+
+	for (int i = 0; i < 8; i++)
+	{
+		hum_reading <<= 1;
+		hum_reading |= received_data[i];
+	}
+
+	return hum_reading;
+}
 
