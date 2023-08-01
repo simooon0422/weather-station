@@ -8,19 +8,20 @@
 #include "gpio.h"
 #include "tim.h"
 
-uint8_t received_data[40] = {0};
+static uint8_t received_data[40] = {0};
+static TIM_HandleTypeDef *dhttimer;
 
-
-HAL_StatusTypeDef dht11_init(void)
+HAL_StatusTypeDef dht11_init(TIM_HandleTypeDef *timer)
 {
+	dhttimer = timer;
 	HAL_Delay(1000);
-	return HAL_TIM_Base_Start(&htim6);
+	return HAL_TIM_Base_Start(dhttimer);
 }
 
-void delay_us(uint8_t us_value)
+static void delay_us(uint8_t us_value)
 {
-	__HAL_TIM_SET_COUNTER(&htim6, 0);
-	while(__HAL_TIM_GET_COUNTER(&htim6) < us_value) {}
+	__HAL_TIM_SET_COUNTER(dhttimer, 0);
+	while(__HAL_TIM_GET_COUNTER(dhttimer) < us_value) {}
 }
 
 static HAL_StatusTypeDef start_measurment(void)

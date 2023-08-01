@@ -12,7 +12,7 @@
 // Initialization of 1-wire
 // Start timer for us delay
 // return - HAL_OK/HAL_ERROR
-HAL_StatusTypeDef dht11_init(void);
+HAL_StatusTypeDef dht11_init(TIM_HandleTypeDef *timer);
 
 // Read bits sent from sensor
 void read_data(void);

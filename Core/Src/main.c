@@ -99,14 +99,14 @@ int main(void)
   MX_TIM6_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  dht11_init();
-//  HAL_StatusTypeDef test = start_measurment();
-  read_data();
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  dht11_init(&htim6);
+  read_data();
+
   uint8_t temp = get_temperature();
   uint8_t hum = get_humidity();
 
