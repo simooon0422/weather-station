@@ -58,11 +58,11 @@ static int read_bit(void)
 		reading = HAL_GPIO_ReadPin(DHT11_GPIO_Port, DHT11_Pin);
 	}
 
-	if(__HAL_TIM_GET_COUNTER(&htim6) >= 50)
+	if(__HAL_TIM_GET_COUNTER(&htim6) > 28)
 	{
 		reading = 1;
 	}
-	else if (__HAL_TIM_GET_COUNTER(&htim6) < 50)
+	else if (__HAL_TIM_GET_COUNTER(&htim6) <= 28)
 	{
 		reading = 0;
 	}
@@ -102,11 +102,19 @@ static int read_bit(void)
 	 }
  }
 
-//uint8_t get_temperature()
-//{
-//
-//}
-//
+uint8_t get_temperature()
+{
+	uint8_t temp_reading = 0;
+
+	for (int i = 16; i < 24; i++)
+	{
+		temp_reading <<= 1;
+		temp_reading |= received_data[i];
+	}
+
+	return temp_reading;
+}
+
 //uint8_t get_humidity()
 //{
 //

@@ -107,6 +107,9 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint8_t temp = get_temperature();
+  printf("Temperature: %d\n", temp);
+
   while (1)
   {
 //	  read_data();
