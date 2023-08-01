@@ -24,7 +24,7 @@ static void delay_us(uint8_t us_value)
 	while(__HAL_TIM_GET_COUNTER(dhttimer) < us_value) {}
 }
 
-static HAL_StatusTypeDef start_measurment(void)
+static uint8_t start_signal()
 {
 	int response;
 
@@ -35,7 +35,12 @@ static HAL_StatusTypeDef start_measurment(void)
 	response = HAL_GPIO_ReadPin(DHT11_GPIO_Port, DHT11_Pin);
 	delay_us(160);
 
-	if(response == 0)
+	return response;
+}
+
+static HAL_StatusTypeDef start_measurment(void)
+{
+	if(start_signal() == 0)
 	{
 		return HAL_OK;
 	}
