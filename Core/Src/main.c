@@ -105,17 +105,16 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   dht11_init(&htim6);
-  read_data();
+  dht11_read_data();
 
-  uint8_t temp = get_temperature();
-  uint8_t hum = get_humidity();
+  uint8_t temp = dht11_get_temperature();
+  uint8_t hum = dht11_get_humidity();
 
   printf("Temperature: %d\n", temp);
   printf("Humidity: %d\n", hum);
 
   while (1)
   {
-//	  read_data();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

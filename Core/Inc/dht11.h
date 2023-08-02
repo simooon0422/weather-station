@@ -15,12 +15,12 @@
 HAL_StatusTypeDef dht11_init(TIM_HandleTypeDef *timer);
 
 // Read bits sent from sensor
-void read_data(void);
+void dht11_read_data(void);
 
 // Read measured temperature
 // return - temperature in Celsius degrees
-uint8_t get_temperature();
+uint8_t dht11_get_temperature();
 
 // Read measured humidity
 // return - relative humidity in %
-uint8_t get_humidity();
+uint8_t dht11_get_humidity();
