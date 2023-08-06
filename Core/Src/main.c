@@ -74,6 +74,11 @@ void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 	}
 }
 
+uint8_t num_places(uint8_t n) {
+    if (n < 10) return 1;
+    return 1 + num_places(n / 10);
+}
+
 int __io_putchar(int ch)
 {
   if (ch == '\n') {
@@ -119,6 +124,24 @@ int main(void)
   MX_USART2_UART_Init();
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
+  void display_temperature()
+  {
+	  uint8_t temp = dht11_get_temperature();
+	  uint8_t digits_num = num_places(temp);
+	  char temp_char[digits_num];
+	  sprintf(temp_char, "%u",temp);
+
+	  wchar_t text[] = L"Temperature:   'C";
+
+	  for (int i = 0; i < digits_num; i++)
+	  {
+		  text[12+i+(3-digits_num)] = temp_char[i];
+	  }
+
+	  lcd_draw_image_8(0, 0, 40, 40, temperature_icon);
+	  hagl_put_text(text, 42, 16, YELLOW, font6x9);
+	  lcd_copy();
+  }
 
   /* USER CODE END 2 */
 
@@ -127,28 +150,20 @@ int main(void)
   dht11_init(&htim6);
   lcd_init();
 
-//  for (int i = 0; i < 8; i++) {
-//    hagl_draw_rounded_rectangle(2+i, 2+i, 158-i, 126-i, 8-i, rgb565(0, 0, i*16));
-//  }
-//
-//  hagl_put_text(L"Hello!", 40, 55, YELLOW, font6x9);
-//
-//  lcd_copy();
 
-  lcd_draw_image_8(0, 0, 40, 40, temperature_icon);
-  lcd_draw_image_8(0, 44, 40, 40, humidity_icon);
-  hagl_put_text(L"Temperature:", 42, 16, YELLOW, font6x9);
-  hagl_put_text(L"Humidity:", 42, 60, YELLOW, font6x9);
-  lcd_copy();
+//  lcd_draw_image_8(0, 0, 40, 40, temperature_icon);
+//  lcd_draw_image_8(0, 44, 40, 40, humidity_icon);
+//  hagl_put_text(L"Temperature:", 42, 16, YELLOW, font6x9);
+//  hagl_put_text(L"Humidity:", 42, 60, YELLOW, font6x9);
+//  lcd_copy();
 
 
   dht11_read_data();
 
-  uint8_t temp = dht11_get_temperature();
-  uint8_t hum = dht11_get_humidity();
+  printf("Temperature: %d\n", dht11_get_temperature());
+  printf("Humidity: %d\n", dht11_get_humidity());
 
-  printf("Temperature: %d\n", temp);
-  printf("Humidity: %d\n", hum);
+  display_temperature();
 
   while (1)
   {
