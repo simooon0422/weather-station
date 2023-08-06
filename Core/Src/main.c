@@ -28,6 +28,8 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "dht11.h"
+#include "lcd.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,6 +60,14 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+	if (hspi == &hspi2)
+	{
+		HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET);
+	}
+}
+
 int __io_putchar(int ch)
 {
   if (ch == '\n') {
