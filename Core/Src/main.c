@@ -28,8 +28,12 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "dht11.h"
-#include "lcd.h"
 
+//#include "lcd.h"
+
+#include "hagl.h"
+#include "font6x9.h"
+#include "rgb565.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -119,6 +123,15 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   dht11_init(&htim6);
+  lcd_init();
+
+  for (int i = 0; i < 8; i++) {
+    hagl_draw_rounded_rectangle(2+i, 2+i, 158-i, 126-i, 8-i, rgb565(0, 0, i*16));
+  }
+
+  hagl_put_text(L"Hello World!", 40, 55, YELLOW, font6x9);
+
+  lcd_copy();
 
   dht11_read_data();
 
