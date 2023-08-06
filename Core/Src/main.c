@@ -29,11 +29,13 @@
 #include <stdio.h>
 #include "dht11.h"
 
-//#include "lcd.h"
+#include "lcd.h"
 
 #include "hagl.h"
 #include "font6x9.h"
 #include "rgb565.h"
+
+#include "icons.c"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -125,13 +127,22 @@ int main(void)
   dht11_init(&htim6);
   lcd_init();
 
-  for (int i = 0; i < 8; i++) {
-    hagl_draw_rounded_rectangle(2+i, 2+i, 158-i, 126-i, 8-i, rgb565(0, 0, i*16));
-  }
+//  for (int i = 0; i < 8; i++) {
+//    hagl_draw_rounded_rectangle(2+i, 2+i, 158-i, 126-i, 8-i, rgb565(0, 0, i*16));
+//  }
+//
+//  hagl_put_text(L"Hello!", 40, 55, YELLOW, font6x9);
+//
+//  lcd_copy();
 
-  hagl_put_text(L"Hello World!", 40, 55, YELLOW, font6x9);
-
+  lcd_draw_image_8(0, 0, 40, 40, temperature_icon);
+  hagl_put_text(L"Temperature:", 42, 16, YELLOW, font6x9);
   lcd_copy();
+
+//  lcd_draw_image_8(0, 44, 40, 84, humidity_icon);
+//  hagl_put_text(L"Humidity:", 42, 56, YELLOW, font6x9);
+//  lcd_copy();
+
 
   dht11_read_data();
 
