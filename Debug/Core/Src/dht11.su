@@ -1,0 +1,8 @@
+../Core/Src/dht11.c:24:19:dht11_init	16	static
+../Core/Src/dht11.c:31:13:delay_us	16	static
+../Core/Src/dht11.c:37:16:start_signal	8	static
+../Core/Src/dht11.c:47:26:start_measurment	8	static
+../Core/Src/dht11.c:59:12:read_bit	8	static
+../Core/Src/dht11.c:77:7:dht11_read_data	16	static
+../Core/Src/dht11.c:89:9:dht11_get_temperature	16	static
+../Core/Src/dht11.c:102:9:dht11_get_humidity	16	static
