@@ -109,6 +109,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   dht11_init(&htim6);
+
   dht11_read_data();
 
   uint8_t temp = dht11_get_temperature();
