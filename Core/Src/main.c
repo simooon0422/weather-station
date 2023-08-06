@@ -136,12 +136,10 @@ int main(void)
 //  lcd_copy();
 
   lcd_draw_image_8(0, 0, 40, 40, temperature_icon);
+  lcd_draw_image_8(0, 44, 40, 40, humidity_icon);
   hagl_put_text(L"Temperature:", 42, 16, YELLOW, font6x9);
+  hagl_put_text(L"Humidity:", 42, 60, YELLOW, font6x9);
   lcd_copy();
-
-//  lcd_draw_image_8(0, 44, 40, 84, humidity_icon);
-//  hagl_put_text(L"Humidity:", 42, 56, YELLOW, font6x9);
-//  lcd_copy();
 
 
   dht11_read_data();

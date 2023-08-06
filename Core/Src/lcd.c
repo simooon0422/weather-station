@@ -151,12 +151,13 @@ bool lcd_is_busy(void)
 
 void lcd_draw_image_8(int x0, int y0, int width, int height, const uint8_t* image)
 {
+	int x0_init = x0;
 	for (int y = 0; y < height*2; y+=2) {
 	  for (int x = 0; x < width*2; x+=2) {
 	    lcd_put_pixel_8(x0, y0, image[x + y * width], image[x + y * width + 1]);
 	    x0++;
 	  }
-	  x0 = 0;
+	  x0 = x0_init;
 	  y0++;
 	}
 }
