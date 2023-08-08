@@ -129,7 +129,7 @@ int main(void)
 	  uint8_t temp = dht11_get_temperature();
 	  uint8_t digits_num = num_places(temp);
 	  char temp_char[digits_num];
-	  sprintf(temp_char, "%u",temp);
+	  sprintf(temp_char, "%u", temp);
 
 	  wchar_t text[] = L"Temperature:   'C";
 
@@ -140,6 +140,25 @@ int main(void)
 
 	  lcd_draw_image_8(0, 0, 40, 40, temperature_icon);
 	  hagl_put_text(text, 42, 16, YELLOW, font6x9);
+	  lcd_copy();
+  }
+
+  void display_humidity()
+  {
+	  uint8_t hum = dht11_get_humidity();
+	  uint8_t digits_num = num_places(hum);
+	  char temp_char[digits_num];
+	  sprintf(temp_char, "%u", hum);
+
+	  wchar_t text[] = L"Humidity:   %";
+
+	  for (int i = 0; i < digits_num; i++)
+	  {
+		  text[9+i+(3-digits_num)] = temp_char[i];
+	  }
+
+	  lcd_draw_image_8(0, 44, 40, 40, humidity_icon);
+	  hagl_put_text(text, 42, 60, YELLOW, font6x9);
 	  lcd_copy();
   }
 
@@ -164,6 +183,7 @@ int main(void)
   printf("Humidity: %d\n", dht11_get_humidity());
 
   display_temperature();
+  display_humidity();
 
   while (1)
   {
