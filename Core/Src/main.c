@@ -187,6 +187,16 @@ int main(void)
 
   while (1)
   {
+	  HAL_Delay(1500);
+	  dht11_read_data();
+
+	  printf("Temperature: %d\n", dht11_get_temperature());
+	  printf("Humidity: %d\n", dht11_get_humidity());
+
+	  display_temperature();
+	  display_humidity();
+
+	  dht11_clear_data();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

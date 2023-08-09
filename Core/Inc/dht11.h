@@ -24,3 +24,6 @@ uint8_t dht11_get_temperature();
 // Read measured humidity
 // return - relative humidity in %
 uint8_t dht11_get_humidity();
+
+// Clears array with received data
+void dht11_clear_data(void);
