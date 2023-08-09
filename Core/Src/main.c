@@ -28,8 +28,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#include "dht11.h"
+#include <math.h>
 
+#include "dht11.h"
+#include "lps25hb.h"
 #include "lcd.h"
 
 #include "hagl.h"
@@ -164,12 +166,32 @@ int main(void)
 	  lcd_copy();
   }
 
+//  float lps25hb_read_rel_pressure()
+//  {
+//	  const float h = 275; // height above sea level
+//
+//	  float temp = lps25hb_read_temp() + 273.15;
+//	  float p = lps25hb_read_pressure();
+//	  float p0 = p * exp(0.034162608734308 * h / temp);
+//
+//	  return p0;
+//  }
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   dht11_init(&htim6);
   lcd_init();
+
+  if (lps25hb_init() == HAL_OK) {
+    printf("OK: LPS25HB\n");
+  } else {
+    printf("Error: LPS25HB not found\n");
+    Error_Handler();
+  }
+//  lps25hb_set_calib(-24);
 
 
 //  lcd_draw_image_8(0, 0, 40, 40, temperature_icon);
@@ -183,6 +205,9 @@ int main(void)
 
   printf("Temperature: %d\n", dht11_get_temperature());
   printf("Humidity: %d\n", dht11_get_humidity());
+  printf("Temperature LPS: %.1f*C\n", lps25hb_read_temp());
+  printf("Pressure = %.1f hPa\n", lps25hb_read_pressure());
+  printf("Relative pressure = %.1f hPa\n", lps25hb_read_rel_pressure());
 
   display_temperature();
   display_humidity();
@@ -190,15 +215,18 @@ int main(void)
   while (1)
   {
 	  HAL_Delay(1500);
-	  dht11_read_data();
-
-	  printf("Temperature: %d\n", dht11_get_temperature());
-	  printf("Humidity: %d\n", dht11_get_humidity());
-
-	  display_temperature();
-	  display_humidity();
-
-	  dht11_clear_data();
+	  printf("Temperature LPS: %.1f*C\n", lps25hb_read_temp());
+	  printf("Pressure = %.1f hPa\n", lps25hb_read_pressure());
+	  printf("Relative pressure = %.1f hPa\n", lps25hb_read_rel_pressure());
+//	  dht11_read_data();
+//
+//	  printf("Temperature: %d\n", dht11_get_temperature());
+//	  printf("Humidity: %d\n", dht11_get_humidity());
+//
+//	  display_temperature();
+//	  display_humidity();
+//
+//	  dht11_clear_data();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

@@ -14,5 +14,9 @@ float lps25hb_read_temp(void);
 // return - result in hPa
 float lps25hb_read_pressure(void);
 
+// Relative pressure
+// return - result in hPa
+float lps25hb_read_rel_pressure();
+
 //calibration
 void lps25hb_set_calib(uint16_t value);

@@ -1,5 +1,6 @@
 #include "lps25hb.h"
 #include "i2c.h"
+#include <math.h>
 
 #define LPS25HB_ADDR        0xBA
 
@@ -23,6 +24,8 @@
 #define LPS25HB_FIFO_CTRL		0x2E
 
 #define TIMEOUT                 100
+
+#define HEIGHT_ASL				275
 
 static uint8_t lps_read_reg(uint8_t reg)
 {
@@ -74,4 +77,13 @@ void lps25hb_set_calib(uint16_t value)
 {
 	lps_write_reg(LPS25HB_RPDS_L, value);
 	lps_write_reg(LPS25HB_RPDS_H, value >> 8);
+}
+
+float lps25hb_read_rel_pressure()
+{
+	  float temp = lps25hb_read_temp() + 273.15;
+	  float p = lps25hb_read_pressure();
+	  float p0 = p * exp(0.034162608734308 * HEIGHT_ASL / temp);
+
+	  return p0;
 }
