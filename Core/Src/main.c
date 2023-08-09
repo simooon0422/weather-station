@@ -77,7 +77,7 @@ void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 	}
 }
 
-uint8_t num_places(uint8_t n) {
+uint8_t num_places(uint16_t n) {
     if (n < 10) return 1;
     return 1 + num_places(n / 10);
 }
@@ -165,6 +165,25 @@ int main(void)
 	  hagl_put_text(text, 42, 60, YELLOW, font6x9);
 	  lcd_copy();
   }
+  void display_pressure()
+  {
+//	  float pres = lps25hb_read_rel_pressure();
+	  uint16_t pres = lps25hb_read_rel_pressure();
+	  uint8_t digits_num = num_places(pres);
+	  char temp_char[digits_num];
+	  sprintf(temp_char, "%u", pres);
+
+	  wchar_t text[] = L"Pressure:     hPa";
+
+	  for (int i = 0; i < digits_num; i++)
+	  {
+		  text[10+i+(4-digits_num)] = temp_char[i];
+	  }
+
+	  lcd_draw_image_8(0, 88, 40, 40, pressure_icon);
+	  hagl_put_text(text, 42, 104, YELLOW, font6x9);
+	  lcd_copy();
+  }
 
 //  float lps25hb_read_rel_pressure()
 //  {
@@ -211,6 +230,7 @@ int main(void)
 
   display_temperature();
   display_humidity();
+  display_pressure();
 
   while (1)
   {
