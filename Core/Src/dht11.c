@@ -118,11 +118,3 @@ uint8_t dht11_get_humidity()
 
 	return hum_reading;
 }
-
-void dht11_clear_data(void)
-{
-	for (int i = 0; i < 40; i++)
-	{
-		received_data[i] = 0;
-	}
-}
