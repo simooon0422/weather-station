@@ -128,9 +128,40 @@ int main(void)
   MX_SPI2_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  void display_temperature()
+  uint8_t temperature;
+  uint8_t humidity;
+  uint16_t pressure;
+
+  void initialize_peripherals()
   {
-	  uint8_t temp = dht11_get_temperature();
+	  if (dht11_init(&htim6) == HAL_OK) {
+	    printf("OK: DHT11 timer started\n");
+	  } else {
+	    printf("Error: DHT11 timer error\n");
+	    Error_Handler();
+	  }
+
+	  if (lps25hb_init() == HAL_OK) {
+	    printf("OK: LPS25HB found\n");
+	  } else {
+	    printf("Error: LPS25HB not found\n");
+	    Error_Handler();
+	  }
+//	  lps25hb_set_calib(-24); // only for calibration
+
+	  lcd_init();
+  }
+
+  void read_data()
+  {
+	  dht11_read_data();
+	  temperature = dht11_get_temperature();
+	  humidity = dht11_get_humidity();
+	  pressure = roundf(lps25hb_read_rel_pressure());
+  }
+
+  void display_temperature(uint8_t temp)
+  {
 	  uint8_t digits_num = num_places(temp);
 	  char temp_char[digits_num];
 	  sprintf(temp_char, "%u", temp);
@@ -143,13 +174,11 @@ int main(void)
 	  }
 
 	  lcd_draw_image_8(0, 0, 40, 40, temperature_icon);
-	  hagl_put_text(text, 42, 16, YELLOW, font6x9);
-	  lcd_copy();
+	  hagl_put_text(text, 42, 16, GREEN, font6x9);
   }
 
-  void display_humidity()
+  void display_humidity(uint8_t hum)
   {
-	  uint8_t hum = dht11_get_humidity();
 	  uint8_t digits_num = num_places(hum);
 	  char temp_char[digits_num];
 	  sprintf(temp_char, "%u", hum);
@@ -162,13 +191,11 @@ int main(void)
 	  }
 
 	  lcd_draw_image_8(0, 44, 40, 40, humidity_icon);
-	  hagl_put_text(text, 42, 60, YELLOW, font6x9);
-	  lcd_copy();
+	  hagl_put_text(text, 42, 60, GREEN, font6x9);
   }
-  void display_pressure()
+
+  void display_pressure(uint16_t pres)
   {
-//	  float pres = lps25hb_read_rel_pressure();
-	  uint16_t pres = lps25hb_read_rel_pressure();
 	  uint8_t digits_num = num_places(pres);
 	  char temp_char[digits_num];
 	  sprintf(temp_char, "%u", pres);
@@ -181,72 +208,39 @@ int main(void)
 	  }
 
 	  lcd_draw_image_8(0, 88, 40, 40, pressure_icon);
-	  hagl_put_text(text, 42, 104, YELLOW, font6x9);
+	  hagl_put_text(text, 42, 104, GREEN, font6x9);
+  }
+
+  void update_display()
+  {
+	  display_temperature(temperature);
+	  display_humidity(humidity);
+	  display_pressure(pressure);
 	  lcd_copy();
   }
 
-//  float lps25hb_read_rel_pressure()
-//  {
-//	  const float h = 275; // height above sea level
-//
-//	  float temp = lps25hb_read_temp() + 273.15;
-//	  float p = lps25hb_read_pressure();
-//	  float p0 = p * exp(0.034162608734308 * h / temp);
-//
-//	  return p0;
-//  }
-
+  void uart_overseer()
+  {
+	  printf("Temperature: %d\n", dht11_get_temperature());
+	  printf("Humidity: %d\n", dht11_get_humidity());
+	  printf("Temperature LPS: %.1f*C\n", lps25hb_read_temp());
+	  printf("Pressure float= %.1f hPa\n", lps25hb_read_rel_pressure());
+	  printf("Relative pressure = %u hPa\n", pressure);
+  }
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  dht11_init(&htim6);
-  lcd_init();
-
-  if (lps25hb_init() == HAL_OK) {
-    printf("OK: LPS25HB\n");
-  } else {
-    printf("Error: LPS25HB not found\n");
-    Error_Handler();
-  }
-//  lps25hb_set_calib(-24);
-
-
-//  lcd_draw_image_8(0, 0, 40, 40, temperature_icon);
-//  lcd_draw_image_8(0, 44, 40, 40, humidity_icon);
-//  hagl_put_text(L"Temperature:", 42, 16, YELLOW, font6x9);
-//  hagl_put_text(L"Humidity:", 42, 60, YELLOW, font6x9);
-//  lcd_copy();
-
-
-  dht11_read_data();
-
-  printf("Temperature: %d\n", dht11_get_temperature());
-  printf("Humidity: %d\n", dht11_get_humidity());
-  printf("Temperature LPS: %.1f*C\n", lps25hb_read_temp());
-  printf("Pressure = %.1f hPa\n", lps25hb_read_pressure());
-  printf("Relative pressure = %.1f hPa\n", lps25hb_read_rel_pressure());
-
-  display_temperature();
-  display_humidity();
-  display_pressure();
+  initialize_peripherals();
 
   while (1)
   {
-	  HAL_Delay(1500);
-	  printf("Temperature LPS: %.1f*C\n", lps25hb_read_temp());
-	  printf("Pressure = %.1f hPa\n", lps25hb_read_pressure());
-	  printf("Relative pressure = %.1f hPa\n", lps25hb_read_rel_pressure());
-//	  dht11_read_data();
-//
-//	  printf("Temperature: %d\n", dht11_get_temperature());
-//	  printf("Humidity: %d\n", dht11_get_humidity());
-//
-//	  display_temperature();
-//	  display_humidity();
-//
-//	  dht11_clear_data();
+	  read_data();
+	  update_display();
+	  uart_overseer();
+	  HAL_Delay(5000);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
