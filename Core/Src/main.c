@@ -28,6 +28,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 #include "dht11.h"
@@ -238,8 +239,30 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   initialize_peripherals();
 
-  hagl_draw_line(5, 17, 71, 99, GREEN);
-  hagl_fill_circle(60, 60, 15, RED);
+
+  for (int i = 0; i < 24; i++)
+  {
+	  last_24_temp[i] = rand() % (40 + 1 - 0) + 0;
+  }
+
+
+  int x_pos = 30;
+  int y_base = 110;
+
+  hagl_draw_hline(20, y_base, 140, YELLOW);
+  hagl_draw_vline(20, 10, 100, YELLOW);
+  hagl_put_text(L"0", 15, 100, RED, font6x9);
+
+  for (int i = 0; i < 24; i++)
+  {
+	  hagl_fill_circle(x_pos, y_base - (last_24_temp[i]*2), 2, RED);
+	  if(i < 23)
+	  {
+		  hagl_draw_line(x_pos, y_base - (last_24_temp[i]*2), x_pos + 5, y_base - (last_24_temp[i+1]*2), RED);
+	  }
+	  x_pos += 5;
+  }
+
   lcd_copy();
   while (1)
   {
