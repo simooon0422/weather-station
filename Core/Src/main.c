@@ -132,6 +132,10 @@ int main(void)
   uint8_t humidity;
   uint16_t pressure;
 
+  uint8_t last_24_temp[24] = {0};
+  uint8_t last_24_hum[24] = {0};
+  uint16_t last_24_pres[24] = {0};
+
   void initialize_peripherals()
   {
 	  if (dht11_init(&htim6) == HAL_OK) {
@@ -234,12 +238,15 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   initialize_peripherals();
 
+  hagl_draw_line(5, 17, 71, 99, GREEN);
+  hagl_fill_circle(60, 60, 15, RED);
+  lcd_copy();
   while (1)
   {
-	  read_data();
-	  update_display();
-	  uart_overseer();
-	  HAL_Delay(5000);
+//	  read_data();
+//	  update_display();
+//	  uart_overseer();
+//	  HAL_Delay(5000);
 
     /* USER CODE END WHILE */
 
