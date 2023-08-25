@@ -233,6 +233,87 @@ int main(void)
 	  printf("Relative pressure = %u hPa\n", pressure);
   }
 
+  void draw_axes()
+  {
+	  int x0 = 20;
+	  int x_length = 135;
+	  int x_offset = 30;
+
+	  int y0 = 105;
+	  int y_start = 10;
+	  int y_length = 118;
+
+	  int divider_length = 5;
+
+	  // X Axis
+	  hagl_draw_hline(x0, y0, x_length, YELLOW);
+	  for (int i = 0; i < 5; i++)
+	  {
+		  hagl_draw_vline(x_offset + i * 30, y0 - divider_length, divider_length, YELLOW);
+	  }
+
+	  // Y Axis
+	  hagl_draw_vline(x0, y_start, y_length, YELLOW);
+	  for (int i = 0; i < 6; i++)
+	  {
+		  hagl_draw_hline(x0, i * 20 + 25, divider_length, YELLOW);
+	  }
+
+  }
+
+  void draw_scales()
+  {
+	  int y0 = 105;
+	  int x_desc_start = 2;
+	  int y_desc_start = y0 + 5;
+
+	  // Title
+	  hagl_put_text(L"TEMPERATURE", 50, 5, GREEN, font6x9);
+
+	  // X Axis
+	  hagl_put_text(L"[h]", 140, y0 - 10, RED, font6x9);
+
+	  hagl_put_text(L"0", 148, y_desc_start, RED, font6x9);
+	  hagl_put_text(L"-6", 115, y_desc_start, RED, font6x9);
+	  hagl_put_text(L"-12", 83, y_desc_start, RED, font6x9);
+	  hagl_put_text(L"-18", 53, y_desc_start, RED, font6x9);
+	  hagl_put_text(L"-24", 23, y_desc_start, RED, font6x9);
+
+	  // Y Axis
+	  hagl_put_text(L"[^C]", x_desc_start, 10, RED, font6x9);
+
+	  hagl_put_text(L"-10", x_desc_start, 120, RED, font6x9);
+	  hagl_put_text(L"  0", x_desc_start, 102, RED, font6x9);
+	  hagl_put_text(L" 10", x_desc_start, 82, RED, font6x9);
+	  hagl_put_text(L" 20", x_desc_start, 62, RED, font6x9);
+	  hagl_put_text(L" 30", x_desc_start, 42, RED, font6x9);
+	  hagl_put_text(L" 40", x_desc_start, 22, RED, font6x9);
+  }
+
+  void draw_data()
+  {
+	  int x_pos = 30;
+	  int x_increment = 5;
+	  int y0 = 105;
+
+	  for (int i = 0; i < 24; i++)
+	  {
+		  hagl_fill_circle(x_pos, y0 - (last_24_temp[i]*2), 2, RED);
+		  if(i < 23)
+		  {
+			  hagl_draw_line(x_pos, y0 - (last_24_temp[i]*2), x_pos + x_increment, y0 - (last_24_temp[i+1]*2), RED);
+		  }
+		  x_pos += x_increment;
+	  }
+  }
+
+  void draw_chart()
+  {
+	  draw_axes();
+	  draw_scales();
+	  draw_data();
+  }
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -245,47 +326,8 @@ int main(void)
 	  last_24_temp[i] = rand() % (40 + 1 - 0) + 0;
   }
 
+  draw_chart();
 
-  int x_pos = 30;
-  int x_base = 20;
-  int y_base = 105;
-
-  hagl_draw_hline(20, y_base, 135, YELLOW);
-  for (int i = 0; i < 5; i++)
-  {
-	  hagl_draw_vline(x_pos + i*30, y_base - 5, 5, YELLOW);
-  }
-  hagl_put_text(L"0", 148, y_base + 5, RED, font6x9);
-  hagl_put_text(L"-6", 115, y_base + 5, RED, font6x9);
-  hagl_put_text(L"-12", 83, y_base + 5, RED, font6x9);
-  hagl_put_text(L"-18", 53, y_base + 5, RED, font6x9);
-  hagl_put_text(L"-24", 23, y_base + 5, RED, font6x9);
-  hagl_put_text(L"[h]", 140, y_base - 10, RED, font6x9);
-
-  hagl_draw_vline(x_base, 10, 118, YELLOW);
-
-  hagl_put_text(L"-10", 2, 120, RED, font6x9);
-  hagl_put_text(L"  0", 2, 102, RED, font6x9);
-  hagl_put_text(L" 10", 2, 82, RED, font6x9);
-  hagl_put_text(L" 20", 2, 62, RED, font6x9);
-  hagl_put_text(L" 30", 2, 42, RED, font6x9);
-  hagl_put_text(L" 40", 2, 22, RED, font6x9);
-  hagl_put_text(L"[^C]", 2, 10, RED, font6x9);
-
-  for (int i = 0; i < 6; i++)
-  {
-	  hagl_draw_hline(x_base, i*20 + 25, 5, YELLOW);
-  }
-
-  for (int i = 0; i < 24; i++)
-  {
-	  hagl_fill_circle(x_pos, y_base - (last_24_temp[i]*2), 2, RED);
-	  if(i < 23)
-	  {
-		  hagl_draw_line(x_pos, y_base - (last_24_temp[i]*2), x_pos + 5, y_base - (last_24_temp[i+1]*2), RED);
-	  }
-	  x_pos += 5;
-  }
 
   lcd_copy();
   while (1)
