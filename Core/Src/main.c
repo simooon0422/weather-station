@@ -247,11 +247,35 @@ int main(void)
 
 
   int x_pos = 30;
-  int y_base = 110;
+  int x_base = 20;
+  int y_base = 105;
 
-  hagl_draw_hline(20, y_base, 140, YELLOW);
-  hagl_draw_vline(20, 10, 100, YELLOW);
-  hagl_put_text(L"0", 15, 100, RED, font6x9);
+  hagl_draw_hline(20, y_base, 135, YELLOW);
+  for (int i = 0; i < 5; i++)
+  {
+	  hagl_draw_vline(x_pos + i*30, y_base - 5, 5, YELLOW);
+  }
+  hagl_put_text(L"0", 148, y_base + 5, RED, font6x9);
+  hagl_put_text(L"-6", 115, y_base + 5, RED, font6x9);
+  hagl_put_text(L"-12", 83, y_base + 5, RED, font6x9);
+  hagl_put_text(L"-18", 53, y_base + 5, RED, font6x9);
+  hagl_put_text(L"-24", 23, y_base + 5, RED, font6x9);
+  hagl_put_text(L"[h]", 140, y_base - 10, RED, font6x9);
+
+  hagl_draw_vline(x_base, 10, 118, YELLOW);
+
+  hagl_put_text(L"-10", 2, 120, RED, font6x9);
+  hagl_put_text(L"  0", 2, 102, RED, font6x9);
+  hagl_put_text(L" 10", 2, 82, RED, font6x9);
+  hagl_put_text(L" 20", 2, 62, RED, font6x9);
+  hagl_put_text(L" 30", 2, 42, RED, font6x9);
+  hagl_put_text(L" 40", 2, 22, RED, font6x9);
+  hagl_put_text(L"[^C]", 2, 10, RED, font6x9);
+
+  for (int i = 0; i < 6; i++)
+  {
+	  hagl_draw_hline(x_base, i*20 + 25, 5, YELLOW);
+  }
 
   for (int i = 0; i < 24; i++)
   {
