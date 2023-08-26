@@ -162,3 +162,14 @@ void lcd_draw_image_8(int x0, int y0, int width, int height, const uint8_t* imag
 	}
 }
 
+void lcd_clear(void)
+{
+	for (int x = 0; x < LCD_WIDTH; x++)
+	{
+		for (int y = 0; y < LCD_HEIGHT; y++)
+		{
+			lcd_put_pixel(x, y, BLACK);
+		}
+	}
+}
+

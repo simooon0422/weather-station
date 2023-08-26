@@ -133,9 +133,10 @@ int main(void)
   uint8_t humidity;
   uint16_t pressure;
 
-  uint8_t last_24_temp[24] = {0};
-  uint8_t last_24_hum[24] = {0};
-  uint16_t last_24_pres[24] = {0};
+  uint8_t data_position = 24;
+  uint8_t last_25_temp[25] = {0};
+  uint8_t last_25_hum[25] = {0};
+  uint16_t last_25_pres[25] = {0};
 
   void initialize_peripherals()
   {
@@ -233,6 +234,19 @@ int main(void)
 	  printf("Relative pressure = %u hPa\n", pressure);
   }
 
+  void store_data()
+  {
+	  for (int i = 0; i < 24; i++)
+	  {
+		  last_25_temp[i] = last_25_temp[i+1];
+		  last_25_hum[i] = last_25_hum[i+1];
+		  last_25_pres[i] = last_25_pres[i+1];
+	  }
+	  last_25_temp[24] = temperature;
+	  last_25_hum[24] = humidity;
+	  last_25_pres[24] = pressure;
+  }
+
   void draw_axes()
   {
 	  int x0 = 20;
@@ -296,12 +310,12 @@ int main(void)
 	  int x_increment = 5;
 	  int y0 = 105;
 
-	  for (int i = 0; i < 24; i++)
+	  for (int i = 0; i < 25; i++)
 	  {
-		  hagl_fill_circle(x_pos, y0 - (last_24_temp[i]*2), 2, RED);
-		  if(i < 23)
+		  hagl_fill_circle(x_pos, y0 - (last_25_temp[i]*2), 2, RED);
+		  if(i < 24)
 		  {
-			  hagl_draw_line(x_pos, y0 - (last_24_temp[i]*2), x_pos + x_increment, y0 - (last_24_temp[i+1]*2), RED);
+			  hagl_draw_line(x_pos, y0 - (last_25_temp[i]*2), x_pos + x_increment, y0 - (last_25_temp[i+1]*2), RED);
 		  }
 		  x_pos += x_increment;
 	  }
@@ -309,9 +323,11 @@ int main(void)
 
   void draw_chart()
   {
+	  lcd_clear();
 	  draw_axes();
 	  draw_scales();
 	  draw_data();
+	  lcd_copy();
   }
 
   /* USER CODE END 2 */
@@ -321,21 +337,21 @@ int main(void)
   initialize_peripherals();
 
 
-  for (int i = 0; i < 24; i++)
-  {
-	  last_24_temp[i] = rand() % (40 + 1 - 0) + 0;
-  }
-
-  draw_chart();
+//  for (int i = 0; i < 25; i++)
+//  {
+//	  last_25_temp[i] = rand() % (40 + 1 - 0) + 0;
+//  }
 
 
-  lcd_copy();
+
   while (1)
   {
-//	  read_data();
+	  read_data();
+	  store_data();
 //	  update_display();
-//	  uart_overseer();
-//	  HAL_Delay(5000);
+	  draw_chart();
+	  uart_overseer();
+	  HAL_Delay(5000);
 
     /* USER CODE END WHILE */
 

@@ -24,4 +24,5 @@ void lcd_transfer_done(void);
 bool lcd_is_busy(void);
 void lcd_put_pixel_8(int x, int y, uint8_t color1, uint8_t color2);
 void lcd_draw_image_8(int x0, int y0, int width, int height, const uint8_t* image);
+void lcd_clear(void);
 
