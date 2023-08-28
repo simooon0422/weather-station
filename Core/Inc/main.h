@@ -65,6 +65,12 @@ void Error_Handler(void);
 #define LCD_DC_GPIO_Port GPIOB
 #define LCD_CS_Pin GPIO_PIN_12
 #define LCD_CS_GPIO_Port GPIOB
+#define BUTTON_DEC_Pin GPIO_PIN_8
+#define BUTTON_DEC_GPIO_Port GPIOA
+#define BUTTON_DEC_EXTI_IRQn EXTI9_5_IRQn
+#define BUTTON_INC_Pin GPIO_PIN_9
+#define BUTTON_INC_GPIO_Port GPIOA
+#define BUTTON_INC_EXTI_IRQn EXTI9_5_IRQn
 
 /* USER CODE BEGIN Private defines */
 

@@ -70,6 +70,21 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+volatile uint8_t current_screen = 0;
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if (GPIO_Pin == BUTTON_INC_Pin)
+  {
+	  current_screen++;
+  }
+  else if (GPIO_Pin == BUTTON_DEC_Pin)
+  {
+	  current_screen--;
+  }
+}
+
+
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
 	if (hspi == &hspi2)
@@ -153,7 +168,7 @@ int main(void)
 	    printf("Error: LPS25HB not found\n");
 	    Error_Handler();
 	  }
-//	  lps25hb_set_calib(-24); // only for calibration
+	  lps25hb_set_calib(-24);
 
 	  lcd_init();
   }
@@ -334,7 +349,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  initialize_peripherals();
+//  initialize_peripherals();
 
 
 //  for (int i = 0; i < 25; i++)
@@ -343,15 +358,19 @@ int main(void)
 //  }
 
 
+  uint8_t old_counter = current_screen;
 
   while (1)
   {
-	  read_data();
-	  store_data();
+//	  read_data();
+//	  store_data();
 //	  update_display();
-	  draw_chart();
-	  uart_overseer();
-	  HAL_Delay(5000);
+//	  draw_chart();
+//	  uart_overseer();
+	  if (old_counter != current_screen) {
+		  old_counter = current_screen;
+	      printf("counter = %d\n", old_counter);
+	  }
 
     /* USER CODE END WHILE */
 
