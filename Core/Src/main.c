@@ -116,6 +116,10 @@ int __io_putchar(int ch)
 
   return 1;
 }
+
+int map(int x, int in_min, int in_max, int out_min, int out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 /* USER CODE END 0 */
 
 /**
@@ -163,6 +167,7 @@ int main(void)
   char hours[5][3] = {" 0 ", "-6 ", "-12", "-18", "-24"};
   char t_scale[6][3] = {"-10", "  0", " 10", " 20", " 30", " 40"};
   char h_scale[5][3] = {"  0", " 25", " 50", " 75", "100"};
+  char p_scale[5][4] = {" 990", "1000", "1010", "1020", "1030"};
 
   void initialize_peripherals()
   {
@@ -297,7 +302,7 @@ int main(void)
 	  case 't':
 		  // Title
 		  hagl_put_text(L"TEMPERATURE", 50, 5, GREEN, font6x9);
-		  hagl_put_text(L"[^C]", x_desc_start, 5, RED, font6x9);
+		  hagl_put_text(L"['C]", x_desc_start, 5, RED, font6x9);
 
 		  //Y scale
 		  for (int i = 0; i < 6; i++)
@@ -329,7 +334,20 @@ int main(void)
 		  break;
 
 	  case 'p':
+		  // Title
+		  hagl_put_text(L"PRESSURE", 60, 5, GREEN, font6x9);
+		  hagl_put_text(L"[hPa]", x_desc_start, 5, RED, font6x9);
 
+		  //Y scale
+		  for (int i = 0; i < 5; i++)
+		  {
+			  wchar_t text[] = L"    ";
+			  for (int j = 0; j < 4; j++)
+			  {
+				  text[j] = p_scale[i][j];
+			  }
+			  hagl_put_text(text, x_desc_start, 100 - i * 20, RED, font6x9);
+		  }
 		  break;
 
 	  default:
@@ -349,10 +367,11 @@ int main(void)
 	  case 't':
 		  for (int i = 0; i < 25; i++)
 		  {
-			  hagl_fill_circle(x_pos, y0 - (last_25_temp[i]*2), 2, RED);
+			  hagl_fill_circle(x_pos, y0 - map(last_25_temp[i], -10, 40, -20, 80), 2, RED);
 			  if(i < 24)
 			  {
-				  hagl_draw_line(x_pos, y0 - (last_25_temp[i]*2), x_pos + x_increment, y0 - (last_25_temp[i+1]*2), RED);
+				  hagl_draw_line(x_pos, y0 - map(last_25_temp[i], -10, 40, -20, 80), x_pos + x_increment, y0 - map(last_25_temp[i+1], -10, 40, -20, 80), RED);
+//				  hagl_draw_line(x_pos, y0 - (last_25_temp[i]*2), x_pos + x_increment, y0 - (last_25_temp[i+1]*2), RED);
 			  }
 			  x_pos += x_increment;
 		  }
@@ -360,10 +379,21 @@ int main(void)
 	  case 'h':
 		  for (int i = 0; i < 25; i++)
 		  {
-			  hagl_fill_circle(x_pos, y0 - (last_25_hum[i]*0.8), 2, CYAN);
+			  hagl_fill_circle(x_pos, y0 - map(last_25_hum[i], 0, 100, 0, 80), 2, CYAN);
 			  if(i < 24)
 			  {
-				  hagl_draw_line(x_pos, y0 - (last_25_hum[i]*0.8), x_pos + x_increment, y0 - (last_25_hum[i+1]*0.8), CYAN);
+				  hagl_draw_line(x_pos, y0 - map(last_25_hum[i], 0, 100, 0, 80), x_pos + x_increment, y0 - map(last_25_hum[i+1], 0, 100, 0, 80), CYAN);
+			  }
+			  x_pos += x_increment;
+		  }
+		  break;
+	  case 'p':
+		  for (int i = 0; i < 25; i++)
+		  {
+			  hagl_fill_circle(x_pos, y0 - (last_25_pres[i]*0.8), 2, CYAN);
+			  if(i < 24)
+			  {
+				  hagl_draw_line(x_pos, y0 - (last_25_pres[i]*0.8), x_pos + x_increment, y0 - (last_25_pres[i+1]*0.8), CYAN);
 			  }
 			  x_pos += x_increment;
 		  }
