@@ -160,6 +160,9 @@ int main(void)
   uint8_t last_25_hum[25] = {0};
   uint16_t last_25_pres[25] = {0};
 
+  char hours[5][3] = {" 0 ", "-6 ", "-12", "-18", "-24"};
+  char t_scale[6][3] = {"-10", "  0", " 10", " 20", " 30", " 40"};
+
   void initialize_peripherals()
   {
 	  if (dht11_init(&htim6) == HAL_OK) {
@@ -268,33 +271,56 @@ int main(void)
 
   }
 
-  void draw_scales()
+  void draw_scales(char par)
   {
-	  int y0 = 105;
-	  int x_desc_start = 2;
-	  int y_desc_start = y0 + 5;
-
-	  // Title
-	  hagl_put_text(L"TEMPERATURE", 50, 5, GREEN, font6x9);
+	  uint8_t y0 = 105;
+	  uint8_t x_desc_start = 2;
+	  uint8_t y_desc_start = y0 + 5;
 
 	  // X Axis
 	  hagl_put_text(L"[h]", 140, y0 - 10, RED, font6x9);
 
-	  hagl_put_text(L"0", 148, y_desc_start, RED, font6x9);
-	  hagl_put_text(L"-6", 115, y_desc_start, RED, font6x9);
-	  hagl_put_text(L"-12", 83, y_desc_start, RED, font6x9);
-	  hagl_put_text(L"-18", 53, y_desc_start, RED, font6x9);
-	  hagl_put_text(L"-24", 23, y_desc_start, RED, font6x9);
+	  for (int i = 0; i < 5; i++)
+	  {
+		  wchar_t text[] = L"   ";
+		  for (int j = 0; j < 3; j++)
+		  {
+			  text[j] = hours[i][j];
+		  }
+		  hagl_put_text(text, 143 - i * 30, y_desc_start, RED, font6x9);
+	  }
 
 	  // Y Axis
-	  hagl_put_text(L"[^C]", x_desc_start, 10, RED, font6x9);
+	  switch(par)
+	  {
+	  case 't':
+		  // Title
+		  hagl_put_text(L"TEMPERATURE", 50, 5, GREEN, font6x9);
 
-	  hagl_put_text(L"-10", x_desc_start, 120, RED, font6x9);
-	  hagl_put_text(L"  0", x_desc_start, 102, RED, font6x9);
-	  hagl_put_text(L" 10", x_desc_start, 82, RED, font6x9);
-	  hagl_put_text(L" 20", x_desc_start, 62, RED, font6x9);
-	  hagl_put_text(L" 30", x_desc_start, 42, RED, font6x9);
-	  hagl_put_text(L" 40", x_desc_start, 22, RED, font6x9);
+		  //Y scale
+		  for (int i = 0; i < 6; i++)
+		  {
+			  wchar_t text[] = L"   ";
+			  for (int j = 0; j < 3; j++)
+			  {
+				  text[j] = t_scale[i][j];
+			  }
+			  hagl_put_text(text, x_desc_start, 120 - i * 20, RED, font6x9);
+		  }
+		  break;
+
+	  case 'h':
+
+		  break;
+
+	  case 'p':
+
+		  break;
+
+	  default:
+		  lcd_clear();
+		  break;
+	  }
   }
 
   void draw_data()
@@ -314,11 +340,11 @@ int main(void)
 	  }
   }
 
-  void draw_chart()
+  void draw_chart(char measurement)
   {
 	  lcd_clear();
 	  draw_axes();
-	  draw_scales();
+	  draw_scales(measurement);
 	  draw_data();
 	  lcd_copy();
   }
@@ -337,7 +363,7 @@ int main(void)
 		  lcd_copy();
 		  break;
 	  case 1:
-		  draw_chart();
+		  draw_chart('t');
 		  break;
 	  default:
 		  lcd_clear();
@@ -382,20 +408,14 @@ int main(void)
 //  }
 
 
-  uint8_t old_counter = current_screen;
 
   while (1)
   {
 	  read_data();
 	  store_data();
 	  update_display(current_screen);
-//	  draw_chart();
 	  uart_overseer();
 	  HAL_Delay(1500);
-//	  if (old_counter != current_screen) {
-//		  old_counter = current_screen;
-//	      printf("counter = %d\n", old_counter);
-//	  }
 
     /* USER CODE END WHILE */
 
