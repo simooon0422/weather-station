@@ -76,11 +76,19 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if (GPIO_Pin == BUTTON_INC_Pin)
   {
-	  current_screen++;
+	  if (current_screen == 3)
+	  {
+		  current_screen = 0;
+	  }
+	  else current_screen++;
   }
   else if (GPIO_Pin == BUTTON_DEC_Pin)
   {
-	  current_screen--;
+	  if (current_screen == 0)
+	  {
+		  current_screen = 3;
+	  }
+	  else current_screen--;
   }
 }
 
@@ -148,7 +156,6 @@ int main(void)
   uint8_t humidity;
   uint16_t pressure;
 
-  uint8_t data_position = 24;
   uint8_t last_25_temp[25] = {0};
   uint8_t last_25_hum[25] = {0};
   uint16_t last_25_pres[25] = {0};
@@ -232,36 +239,7 @@ int main(void)
 	  hagl_put_text(text, 42, 104, GREEN, font6x9);
   }
 
-  void update_display()
-  {
-	  display_temperature(temperature);
-	  display_humidity(humidity);
-	  display_pressure(pressure);
-	  lcd_copy();
-  }
-
-  void uart_overseer()
-  {
-	  printf("Temperature: %d\n", dht11_get_temperature());
-	  printf("Humidity: %d\n", dht11_get_humidity());
-	  printf("Temperature LPS: %.1f*C\n", lps25hb_read_temp());
-	  printf("Pressure float= %.1f hPa\n", lps25hb_read_rel_pressure());
-	  printf("Relative pressure = %u hPa\n", pressure);
-  }
-
-  void store_data()
-  {
-	  for (int i = 0; i < 24; i++)
-	  {
-		  last_25_temp[i] = last_25_temp[i+1];
-		  last_25_hum[i] = last_25_hum[i+1];
-		  last_25_pres[i] = last_25_pres[i+1];
-	  }
-	  last_25_temp[24] = temperature;
-	  last_25_hum[24] = humidity;
-	  last_25_pres[24] = pressure;
-  }
-
+  ///////////////////////DRAWING CHARTS FUNCTIONS BEGIN////////////////////////////////////
   void draw_axes()
   {
 	  int x0 = 20;
@@ -345,11 +323,57 @@ int main(void)
 	  lcd_copy();
   }
 
+  ///////////////////////DRAWING CHARTS FUNCTIONS END////////////////////////////////////
+
+  void update_display(uint8_t screen)
+  {
+	  switch(screen)
+	  {
+	  case 0:
+		  lcd_clear();
+		  display_temperature(temperature);
+		  display_humidity(humidity);
+		  display_pressure(pressure);
+		  lcd_copy();
+		  break;
+	  case 1:
+		  draw_chart();
+		  break;
+	  default:
+		  lcd_clear();
+	  }
+  }
+
+  void uart_overseer()
+  {
+	  printf("Temperature: %d\n", dht11_get_temperature());
+	  printf("Humidity: %d\n", dht11_get_humidity());
+	  printf("Temperature LPS: %.1f*C\n", lps25hb_read_temp());
+	  printf("Pressure float= %.1f hPa\n", lps25hb_read_rel_pressure());
+	  printf("Relative pressure = %u hPa\n", pressure);
+	  printf("Screen: %u\n", current_screen);
+  }
+
+  void store_data()
+  {
+	  for (int i = 0; i < 24; i++)
+	  {
+		  last_25_temp[i] = last_25_temp[i+1];
+		  last_25_hum[i] = last_25_hum[i+1];
+		  last_25_pres[i] = last_25_pres[i+1];
+	  }
+	  last_25_temp[24] = temperature;
+	  last_25_hum[24] = humidity;
+	  last_25_pres[24] = pressure;
+  }
+
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-//  initialize_peripherals();
+  initialize_peripherals();
 
 
 //  for (int i = 0; i < 25; i++)
@@ -362,15 +386,16 @@ int main(void)
 
   while (1)
   {
-//	  read_data();
-//	  store_data();
-//	  update_display();
+	  read_data();
+	  store_data();
+	  update_display(current_screen);
 //	  draw_chart();
-//	  uart_overseer();
-	  if (old_counter != current_screen) {
-		  old_counter = current_screen;
-	      printf("counter = %d\n", old_counter);
-	  }
+	  uart_overseer();
+	  HAL_Delay(1500);
+//	  if (old_counter != current_screen) {
+//		  old_counter = current_screen;
+//	      printf("counter = %d\n", old_counter);
+//	  }
 
     /* USER CODE END WHILE */
 
