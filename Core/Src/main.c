@@ -74,16 +74,18 @@ volatile uint8_t current_screen = 0;
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  if (GPIO_Pin == BUTTON_INC_Pin)
+  if ((GPIO_Pin == BUTTON_INC_Pin) && (__HAL_TIM_GET_COUNTER(&htim7) > 3000))
   {
+	  __HAL_TIM_SET_COUNTER(&htim7, 0);
 	  if (current_screen == 3)
 	  {
 		  current_screen = 0;
 	  }
 	  else current_screen++;
   }
-  else if (GPIO_Pin == BUTTON_DEC_Pin)
+  else if ((GPIO_Pin == BUTTON_DEC_Pin) && (__HAL_TIM_GET_COUNTER(&htim7) > 3000))
   {
+	  __HAL_TIM_SET_COUNTER(&htim7, 0);
 	  if (current_screen == 0)
 	  {
 		  current_screen = 3;
@@ -155,6 +157,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_SPI2_Init();
   MX_I2C1_Init();
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
   uint8_t temperature;
   uint8_t humidity;
@@ -171,6 +174,8 @@ int main(void)
 
   void initialize_peripherals()
   {
+	  HAL_TIM_Base_Start(&htim7);
+
 	  if (dht11_init(&htim6) == HAL_OK) {
 	    printf("OK: DHT11 timer started\n");
 	  } else {
