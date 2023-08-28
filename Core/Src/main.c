@@ -167,7 +167,7 @@ int main(void)
   char hours[5][3] = {" 0 ", "-6 ", "-12", "-18", "-24"};
   char t_scale[6][3] = {"-10", "  0", " 10", " 20", " 30", " 40"};
   char h_scale[5][3] = {"  0", " 25", " 50", " 75", "100"};
-  char p_scale[5][4] = {" 990", "1000", "1010", "1020", "1030"};
+  char p_scale[5][4] = {"990 ", "1000", "1010", "1020", "1030"};
 
   void initialize_peripherals()
   {
@@ -390,10 +390,10 @@ int main(void)
 	  case 'p':
 		  for (int i = 0; i < 25; i++)
 		  {
-			  hagl_fill_circle(x_pos, y0 - (last_25_pres[i]*0.8), 2, CYAN);
+			  hagl_fill_circle(x_pos, y0 - map(last_25_pres[i], 990, 1030, 0, 80), 2, MAGENTA);
 			  if(i < 24)
 			  {
-				  hagl_draw_line(x_pos, y0 - (last_25_pres[i]*0.8), x_pos + x_increment, y0 - (last_25_pres[i+1]*0.8), CYAN);
+				  hagl_draw_line(x_pos, y0 - map(last_25_pres[i], 990, 1030, 0, 80), x_pos + x_increment, y0 - map(last_25_pres[i+1], 990, 1030, 0, 80), MAGENTA);
 			  }
 			  x_pos += x_increment;
 		  }
@@ -432,6 +432,9 @@ int main(void)
 		  break;
 	  case 2:
 		  draw_chart('h');
+		  break;
+	  case 3:
+		  draw_chart('p');
 		  break;
 	  default:
 		  lcd_clear();
