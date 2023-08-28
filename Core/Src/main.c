@@ -162,6 +162,7 @@ int main(void)
 
   char hours[5][3] = {" 0 ", "-6 ", "-12", "-18", "-24"};
   char t_scale[6][3] = {"-10", "  0", " 10", " 20", " 30", " 40"};
+  char h_scale[5][3] = {"  0", " 25", " 50", " 75", "100"};
 
   void initialize_peripherals()
   {
@@ -296,6 +297,7 @@ int main(void)
 	  case 't':
 		  // Title
 		  hagl_put_text(L"TEMPERATURE", 50, 5, GREEN, font6x9);
+		  hagl_put_text(L"[^C]", x_desc_start, 5, RED, font6x9);
 
 		  //Y scale
 		  for (int i = 0; i < 6; i++)
@@ -310,7 +312,20 @@ int main(void)
 		  break;
 
 	  case 'h':
+		  // Title
+		  hagl_put_text(L"HUMIDITY", 60, 5, GREEN, font6x9);
+		  hagl_put_text(L"[%]", x_desc_start+5, 5, RED, font6x9);
 
+		  //Y scale
+		  for (int i = 0; i < 5; i++)
+		  {
+			  wchar_t text[] = L"   ";
+			  for (int j = 0; j < 3; j++)
+			  {
+				  text[j] = h_scale[i][j];
+			  }
+			  hagl_put_text(text, x_desc_start, 100 - i * 20, RED, font6x9);
+		  }
 		  break;
 
 	  case 'p':
@@ -323,21 +338,41 @@ int main(void)
 	  }
   }
 
-  void draw_data()
+  void draw_data(char par)
   {
-	  int x_pos = 30;
-	  int x_increment = 5;
-	  int y0 = 105;
+	  uint8_t x_pos = 30;
+	  uint8_t x_increment = 5;
+	  uint8_t y0 = 105;
 
-	  for (int i = 0; i < 25; i++)
+	  switch(par)
 	  {
-		  hagl_fill_circle(x_pos, y0 - (last_25_temp[i]*2), 2, RED);
-		  if(i < 24)
+	  case 't':
+		  for (int i = 0; i < 25; i++)
 		  {
-			  hagl_draw_line(x_pos, y0 - (last_25_temp[i]*2), x_pos + x_increment, y0 - (last_25_temp[i+1]*2), RED);
+			  hagl_fill_circle(x_pos, y0 - (last_25_temp[i]*2), 2, RED);
+			  if(i < 24)
+			  {
+				  hagl_draw_line(x_pos, y0 - (last_25_temp[i]*2), x_pos + x_increment, y0 - (last_25_temp[i+1]*2), RED);
+			  }
+			  x_pos += x_increment;
 		  }
-		  x_pos += x_increment;
+		  break;
+	  case 'h':
+		  for (int i = 0; i < 25; i++)
+		  {
+			  hagl_fill_circle(x_pos, y0 - (last_25_hum[i]*0.8), 2, CYAN);
+			  if(i < 24)
+			  {
+				  hagl_draw_line(x_pos, y0 - (last_25_hum[i]*0.8), x_pos + x_increment, y0 - (last_25_hum[i+1]*0.8), CYAN);
+			  }
+			  x_pos += x_increment;
+		  }
+		  break;
+	  default:
+		  lcd_clear();
+		  break;
 	  }
+
   }
 
   void draw_chart(char measurement)
@@ -345,7 +380,7 @@ int main(void)
 	  lcd_clear();
 	  draw_axes();
 	  draw_scales(measurement);
-	  draw_data();
+	  draw_data(measurement);
 	  lcd_copy();
   }
 
@@ -364,6 +399,9 @@ int main(void)
 		  break;
 	  case 1:
 		  draw_chart('t');
+		  break;
+	  case 2:
+		  draw_chart('h');
 		  break;
 	  default:
 		  lcd_clear();
@@ -400,14 +438,6 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   initialize_peripherals();
-
-
-//  for (int i = 0; i < 25; i++)
-//  {
-//	  last_25_temp[i] = rand() % (40 + 1 - 0) + 0;
-//  }
-
-
 
   while (1)
   {
