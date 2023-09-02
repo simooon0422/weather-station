@@ -159,10 +159,6 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t temperature;
-  uint8_t humidity;
-  uint16_t pressure;
-
   uint8_t last_25_temp[25] = {0};
   uint8_t last_25_hum[25] = {0};
   uint16_t last_25_pres[25] = {0};
@@ -194,12 +190,20 @@ int main(void)
 	  lcd_init();
   }
 
-  void read_data()
+  void read_and_store_data()
   {
+	  for (int i = 0; i < 24; i++)
+	  {
+		  last_25_temp[i] = last_25_temp[i+1];
+		  last_25_hum[i] = last_25_hum[i+1];
+		  last_25_pres[i] = last_25_pres[i+1];
+	  }
+
 	  dht11_read_data();
-	  temperature = dht11_get_temperature();
-	  humidity = dht11_get_humidity();
-	  pressure = roundf(lps25hb_read_rel_pressure());
+
+	  last_25_temp[24] = dht11_get_temperature();;
+	  last_25_hum[24] = dht11_get_humidity();
+	  last_25_pres[24] = roundf(lps25hb_read_rel_pressure());
   }
 
   void display_temperature(uint8_t temp)
@@ -423,9 +427,9 @@ int main(void)
   void main_screen(void)
   {
 	  lcd_clear();
-	  display_temperature(temperature);
-	  display_humidity(humidity);
-	  display_pressure(pressure);
+	  display_temperature(last_25_temp[24]);
+	  display_humidity(last_25_hum[24]);
+	  display_pressure(last_25_pres[24]);
 	  lcd_copy();
   }
 
@@ -456,24 +460,9 @@ int main(void)
 	  printf("Humidity: %d\n", dht11_get_humidity());
 	  printf("Temperature LPS: %.1f*C\n", lps25hb_read_temp());
 	  printf("Pressure float= %.1f hPa\n", lps25hb_read_rel_pressure());
-	  printf("Relative pressure = %u hPa\n", pressure);
+	  printf("Relative pressure = %u hPa\n", last_25_pres[24]);
 	  printf("Screen: %u\n", current_screen);
   }
-
-  void store_data()
-  {
-	  for (int i = 0; i < 24; i++)
-	  {
-		  last_25_temp[i] = last_25_temp[i+1];
-		  last_25_hum[i] = last_25_hum[i+1];
-		  last_25_pres[i] = last_25_pres[i+1];
-	  }
-	  last_25_temp[24] = temperature;
-	  last_25_hum[24] = humidity;
-	  last_25_pres[24] = pressure;
-  }
-
-
 
   /* USER CODE END 2 */
 
@@ -483,8 +472,7 @@ int main(void)
 
   while (1)
   {
-	  read_data();
-	  store_data();
+	  read_and_store_data();
 	  update_display(current_screen);
 	  uart_overseer();
 	  HAL_Delay(1500);
