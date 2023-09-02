@@ -72,6 +72,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 volatile uint8_t current_screen = 0;
 
+//Function to handle interrupts (debouncing buttons)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if ((GPIO_Pin == BUTTON_INC_Pin) && (__HAL_TIM_GET_COUNTER(&htim7) > 3000))
@@ -103,11 +104,13 @@ void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 	}
 }
 
+//Function returning number of digits in a number
 uint8_t num_places(uint16_t n) {
     if (n < 10) return 1;
     return 1 + num_places(n / 10);
 }
 
+//Function to use printf() with UART
 int __io_putchar(int ch)
 {
   if (ch == '\n') {
@@ -119,6 +122,7 @@ int __io_putchar(int ch)
   return 1;
 }
 
+//Function to map values
 int map(int x, int in_min, int in_max, int out_min, int out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
@@ -159,37 +163,44 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
+
+  //Arrays storing values of 25 last measurements
   uint8_t last_25_temp[25] = {0};
   uint8_t last_25_hum[25] = {0};
   uint16_t last_25_pres[25] = {0};
 
+  //Arrays storing values for scales in charts
   char hours[5][3] = {" 0 ", "-6 ", "-12", "-18", "-24"};
   char t_scale[6][3] = {"-10", "  0", " 10", " 20", " 30", " 40"};
   char h_scale[5][3] = {"  0", " 25", " 50", " 75", "100"};
   char p_scale[5][4] = {"990 ", "1000", "1010", "1020", "1030"};
 
+  //Function to initialize sensors and lcd display
   void initialize_peripherals()
   {
 	  HAL_TIM_Base_Start(&htim7);
 
+	  //initialize dht11 sensor
 	  if (dht11_init(&htim6) == HAL_OK) {
 	    printf("OK: DHT11 timer started\n");
 	  } else {
 	    printf("Error: DHT11 timer error\n");
 	    Error_Handler();
 	  }
-
+	  //initialize lps25hb sensor
 	  if (lps25hb_init() == HAL_OK) {
 	    printf("OK: LPS25HB found\n");
 	  } else {
 	    printf("Error: LPS25HB not found\n");
 	    Error_Handler();
 	  }
-	  lps25hb_set_calib(-24);
+	  lps25hb_set_calib(-24); //calibrate lps25hb sensor
 
+	  //initialize lcd display
 	  lcd_init();
   }
 
+  //Function to read data from sensors and store them in arrays
   void read_and_store_data()
   {
 	  for (int i = 0; i < 24; i++)
@@ -206,6 +217,7 @@ int main(void)
 	  last_25_pres[24] = roundf(lps25hb_read_rel_pressure());
   }
 
+  //Function to display temperature icon and value on lcd display
   void display_temperature(uint8_t temp)
   {
 	  uint8_t digits_num = num_places(temp);
@@ -223,6 +235,7 @@ int main(void)
 	  hagl_put_text(text, 42, 16, GREEN, font6x9);
   }
 
+  //Function to display humidity icon and value on lcd display
   void display_humidity(uint8_t hum)
   {
 	  uint8_t digits_num = num_places(hum);
@@ -240,6 +253,7 @@ int main(void)
 	  hagl_put_text(text, 42, 60, GREEN, font6x9);
   }
 
+  //Function to display pressure icon and value on lcd display
   void display_pressure(uint16_t pres)
   {
 	  uint8_t digits_num = num_places(pres);
@@ -258,17 +272,19 @@ int main(void)
   }
 
   ///////////////////////DRAWING CHARTS FUNCTIONS BEGIN////////////////////////////////////
+
+  //Function to draw chart's axes
   void draw_axes()
   {
-	  int x0 = 20;
-	  int x_length = 135;
-	  int x_offset = 30;
+	  uint8_t x0 = 20;
+	  uint8_t x_length = 135;
+	  uint8_t x_offset = 30;
 
-	  int y0 = 105;
-	  int y_start = 10;
-	  int y_length = 118;
+	  uint8_t y0 = 105;
+	  uint8_t y_start = 10;
+	  uint8_t y_length = 118;
 
-	  int divider_length = 5;
+	  uint8_t divider_length = 5;
 
 	  // X Axis
 	  hagl_draw_hline(x0, y0, x_length, YELLOW);
@@ -286,6 +302,7 @@ int main(void)
 
   }
 
+  //Function to draw chart's scales depending on parameter
   void draw_scales(char par)
   {
 	  uint8_t y0 = 105;
@@ -308,6 +325,7 @@ int main(void)
 	  // Y Axis
 	  switch(par)
 	  {
+	  //Temperature
 	  case 't':
 		  // Title
 		  hagl_put_text(L"TEMPERATURE", 50, 5, GREEN, font6x9);
@@ -324,7 +342,7 @@ int main(void)
 			  hagl_put_text(text, x_desc_start, 120 - i * 20, RED, font6x9);
 		  }
 		  break;
-
+	//Humidity
 	  case 'h':
 		  // Title
 		  hagl_put_text(L"HUMIDITY", 60, 5, GREEN, font6x9);
@@ -341,7 +359,7 @@ int main(void)
 			  hagl_put_text(text, x_desc_start, 100 - i * 20, RED, font6x9);
 		  }
 		  break;
-
+	//Pressure
 	  case 'p':
 		  // Title
 		  hagl_put_text(L"PRESSURE", 60, 5, GREEN, font6x9);
@@ -365,6 +383,7 @@ int main(void)
 	  }
   }
 
+  //Function to draw chart's data (dots and lines)
   void draw_data(char par)
   {
 	  uint8_t x_pos = 30;
@@ -407,12 +426,13 @@ int main(void)
 		  }
 		  break;
 	  default:
-		  lcd_clear();
+		  lcd_clear(); //clear lcd if parameter is incorrect
 		  break;
 	  }
 
   }
 
+  //Function to draw full chart of temperature, humidity or pressure
   void draw_chart(char measurement)
   {
 	  lcd_clear();
@@ -424,6 +444,7 @@ int main(void)
 
   ///////////////////////DRAWING CHARTS FUNCTIONS END////////////////////////////////////
 
+  //Function displaying main screen with values and icons of temperature, humidity and pressure
   void main_screen(void)
   {
 	  lcd_clear();
@@ -433,6 +454,7 @@ int main(void)
 	  lcd_copy();
   }
 
+  //Update currently displayed screen
   void update_display(uint8_t screen)
   {
 	  switch(screen)
@@ -454,6 +476,7 @@ int main(void)
 	  }
   }
 
+  //Function to control data on UART
   void uart_overseer()
   {
 	  printf("Temperature: %d\n", dht11_get_temperature());
