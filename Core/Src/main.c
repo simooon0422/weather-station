@@ -376,7 +376,6 @@ int main(void)
 			  if(i < 24)
 			  {
 				  hagl_draw_line(x_pos, y0 - map(last_25_temp[i], -10, 40, -20, 80), x_pos + x_increment, y0 - map(last_25_temp[i+1], -10, 40, -20, 80), RED);
-//				  hagl_draw_line(x_pos, y0 - (last_25_temp[i]*2), x_pos + x_increment, y0 - (last_25_temp[i+1]*2), RED);
 			  }
 			  x_pos += x_increment;
 		  }
@@ -421,16 +420,21 @@ int main(void)
 
   ///////////////////////DRAWING CHARTS FUNCTIONS END////////////////////////////////////
 
+  void main_screen(void)
+  {
+	  lcd_clear();
+	  display_temperature(temperature);
+	  display_humidity(humidity);
+	  display_pressure(pressure);
+	  lcd_copy();
+  }
+
   void update_display(uint8_t screen)
   {
 	  switch(screen)
 	  {
 	  case 0:
-		  lcd_clear();
-		  display_temperature(temperature);
-		  display_humidity(humidity);
-		  display_pressure(pressure);
-		  lcd_copy();
+		  main_screen();
 		  break;
 	  case 1:
 		  draw_chart('t');
